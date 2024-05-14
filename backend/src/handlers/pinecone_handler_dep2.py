@@ -1,39 +1,37 @@
-from pinecone import Pinecone
-from src.config import CONFIG
-from sentence_transformers import SentenceTransformer
-from src.shared.base_models import QueryMessage
 
-class Embedder:
-    model = None
-
-    @staticmethod
-    def init_model(model_name, reinit=False):
-        if Embedder.model is None or reinit:
-            Embedder.model = SentenceTransformer(model_name)
-
-    @staticmethod
-    def embed(text):
-        Embedder.init_model(CONFIG["embedding_model"])
-        return Embedder.model.encode(text)
+from llama_index.vector_stores import PineconeVectorStore
+from llama_index.storage.storage_context import StorageContext
+from llama_index import VectorStoreIndex, Document, ServiceContext
+from llama_index.retrievers import VectorIndexRetriever
+from ..schemas.base_models import QueryMessage
+import json
 
 
+# avoid using this class
 class PineconeDB:
-    def __init__(self, index_name):
+    def __init__(self, index_name, CONFIG):
         self.index_name = index_name
-        self.pc = Pinecone(api_key=CONFIG['pinecone']['api_key'])
-        self.index = self.pc.Index(index_name)
+        self.CONFIG = CONFIG
 
-    def make_query(self, query: str):
-        # embed the query
-        query_embedding = Embedder.embed(query)
-        response = self.index.query(
-            namespace=CONFIG["pinecone"]["namespace"],
-            vector=query_embedding,
-            top_k=5,
+        self.vector_store = PineconeVectorStore(
+            index_name=index_name,
+            environment=CONFIG["pinecone"]["environment"],
         )
 
-        #debug
-        print(response)
+        self.vector_index = VectorStoreIndex.from_vector_store(
+            vector_store = self.vector_store,
+        )
+
+        self.retriever = VectorIndexRetriever(index = self.vector_index, similarity_top_k=10)
+        self.query_engine = self.vector_index.as_query_engine()
+
+    def get_retriever(self):    
+        return self.retriever
+    
+    def make_query(self, query: str):
+        response = self.retriever.retrieve(query)
+        # response = self.query_engine.query(query)
+        print("response: ", response)
         return response
 
 class PineconeDBHandler:
@@ -51,8 +49,13 @@ class PineconeDBHandler:
     @staticmethod
     def get_instance(index_name, CONFIG):
         if index_name not in PineconeDBHandler.instances.keys():
-            PineconeDBHandler.instances[index_name] = PineconeDB(index_name)
+            PineconeDBHandler.instances[index_name] = PineconeDB(index_name, CONFIG)
         return PineconeDBHandler.instances[index_name]
+    
+    @staticmethod
+    @validate_instance
+    def get_retriever(index_name):
+        return PineconeDBHandler.instances[index_name].get_retriever()
     
     @staticmethod
     @validate_instance

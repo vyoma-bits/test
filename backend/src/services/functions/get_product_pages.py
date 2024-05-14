@@ -34,7 +34,7 @@ async def get_product_pages(
     )
 
     for i in range(len(response)):
-        response[i] = dict(dict(response[i])["node"])["metadata"]
+        response[i] = response[i]['metadata']
 
     return response
 

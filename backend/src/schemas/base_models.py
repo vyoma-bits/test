@@ -54,9 +54,9 @@ class AudioTTSRequest(BaseModel):
 
 class QueryMessage(BaseModel):
     id: Optional[str] = None
-    category: Optional[str] = None
-    brand: Optional[str] = None
-    model: Optional[str] = None
+    category: Optional[List[str]] = None
+    brand: Optional[List[str]] = None
+    model: Optional[List[str]] = None
     #screen parameter must be a dictionary with keys ram, processor, storage
     screen: Optional[Dict[str, str]] = None
     specs: Optional[Dict[str, str]] = None

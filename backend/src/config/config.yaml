@@ -11,6 +11,7 @@ openai:
 pinecone:
   api_key: $PINECONE_API_KEY
   environment: $PINECONE_ENVIRONMENT
+  namespace: "ns1"
 
 prompts:
   chat:
