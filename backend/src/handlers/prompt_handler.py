@@ -45,7 +45,7 @@ class PromptHandler():
             if message["role"] != "function"
             else {
                 "role": message["role"],
-                "content": message["content"],
+                "content": message["content"] if message["content"] != None else "",
                 "name": message["name"],
             }
             for message in chatlog

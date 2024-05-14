@@ -11,6 +11,8 @@ import json
 import tempfile
 from pathlib import Path
 
+import traceback
+
 # Schemas
 from src.schemas import FunctionCall
 from src.schemas import (
@@ -62,8 +64,9 @@ def create_router(handler: MainHandler, CONFIG):
             response = prompt_handler.prepare_response(prompt_response)
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             response = {"response": "Oops there was an error, please try again", "function_call": None}
+
 
         return response
     
@@ -71,21 +74,22 @@ def create_router(handler: MainHandler, CONFIG):
     async def function_call(function_call: FunctionCall):
         """Receives the function call from the frontend and executes it"""
 
+        # debug
+        print(function_call)
+
         # Preparing functions
         function_call_properties = jsonable_encoder(function_call)
         function_name = function_call_properties["name"]
         function_arguments = json.loads(function_call_properties["arguments"])
-
-        # Configuring functions to be called - it should match the get_functions_signatures, otherwise we need to bypass it
+    
+        # list of available functions
         available_functions = {
             # Obs: all functions need to be async
-            "get_restaurant_pages": lambda kwargs: functions.find_restaurant_pages(CONFIG=CONFIG, **kwargs),
-            "open_restaurant_page": lambda kwargs: functions.open_restaurant_page(CONFIG=CONFIG, **kwargs),
-            "close_restaurant_page": lambda _: functions.dummy_function(), # dummy function - no need of information
-            "get_user_actions": lambda _: functions.dummy_function(), # dummy function - actions are stored in the frontend
-            "get_menu_of_restaurant": lambda kwargs: functions.get_menu_of_restaurant(CONFIG=CONFIG, **kwargs),
-            "add_food_to_cart": lambda kwargs: functions.add_food_to_cart(CONFIG=CONFIG, **kwargs),
-            "remove_food_from_cart": lambda kwargs: functions.remove_food_from_cart(CONFIG=CONFIG, **kwargs),
+            "get_product_pages": lambda kwargs: functions.get_product_pages(CONFIG=CONFIG, **kwargs),
+            "open_product_page": lambda kwargs: functions.open_product_page(CONFIG=CONFIG, **kwargs),
+            "close_product_page": lambda _: functions.dummy_function(), # dummy function - no need of information
+            "add_product_to_cart": lambda kwargs: functions.add_product_to_cart(CONFIG=CONFIG, **kwargs),
+            "remove_product_from_cart": lambda kwargs: functions.remove_product_from_cart(CONFIG=CONFIG, **kwargs),
             "open_shopping_cart": lambda _: functions.dummy_function(), # dummy function - no need of information
             "close_shopping_cart": lambda _: functions.dummy_function(), # dummy function - no need of information
             "place_order": lambda _: functions.dummy_function(), # dummy function - no need of information
@@ -94,7 +98,6 @@ def create_router(handler: MainHandler, CONFIG):
 
         # Calling the function selected
         function_response = await available_functions[function_name](function_arguments)
-        
         return {"response": function_response}
 
     @router.post("/chat/transcribe")

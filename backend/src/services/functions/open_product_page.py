@@ -1,9 +1,8 @@
-
 from tenacity import retry, wait_random, stop_after_attempt
 
 @retry(wait=wait_random(min=1, max=5), stop=stop_after_attempt(5))
-async def open_restaurant_page(
+async def open_product_page(
         CONFIG,
-        restaurant_uuid: str=None
+        product_uuid: str=None
 ):
-    return {"response": {"restaurant_uuid": str(restaurant_uuid)}}
+    return {"response": {"product_uuid": str(product_uuid)}}

@@ -4,7 +4,7 @@ COPY pyproject.toml ./
 
 
 RUN pip install --upgrade pip
-RUN pip install poetry 
+RUN pip install poetry
 RUN poetry config virtualenvs.create false 
 RUN poetry install --only main
 RUN apt-get -y update && apt-get -y upgrade && apt-get install -y ffmpeg

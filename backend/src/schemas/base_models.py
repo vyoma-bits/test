@@ -51,3 +51,17 @@ class AudioResponse(BaseModel):
 
 class AudioTTSRequest(BaseModel):
     text: str
+
+class QueryMessage(BaseModel):
+    id: Optional[str] = None
+    category: Optional[str] = None
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    #screen parameter must be a dictionary with keys ram, processor, storage
+    screen: Optional[Dict[str, str]] = None
+    specs: Optional[Dict[str, str]] = None
+    price: Optional[str] = None
+    other_information: Optional[str] = None
+
+    def __str__(self):
+        return f"{{id: {self.id}, category: {self.category}, brand: {self.brand}, model: {self.model}, screen: {self.screen}, specs: {self.specs}, price: {self.price}, other_information: {self.other_information}}}"
