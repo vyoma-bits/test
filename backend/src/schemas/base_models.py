@@ -40,7 +40,7 @@ class InputChatHistory(BaseModel):
 
 class ChatRequest(BaseModel):
     query: InputChatHistory
-    function_call: bool=True
+    
 
 
 ## Audio system
@@ -52,16 +52,18 @@ class AudioResponse(BaseModel):
 class AudioTTSRequest(BaseModel):
     text: str
 
+from typing import List
+
 class QueryMessage(BaseModel):
-    id: Optional[str] = None
-    category: Optional[List[str]] = None
-    brand: Optional[List[str]] = None
-    model: Optional[List[str]] = None
-    #screen parameter must be a dictionary with keys ram, processor, storage
-    screen: Optional[Dict[str, str]] = None
-    specs: Optional[Dict[str, str]] = None
-    price: Optional[str] = None
+    id: str
+    category: Optional[str] = None  # Make category optional with a default value or provide a valid value
+    brand: Optional[str] = None
+    model: Optional[str] = None  # Change to accept a single string value
+    screen: Optional[str] = None
+    specs: Optional[str] = None
+    price: Optional[float] = None
     other_information: Optional[str] = None
+
 
     def __str__(self):
         return f"{{id: {self.id}, category: {self.category}, brand: {self.brand}, model: {self.model}, screen: {self.screen}, specs: {self.specs}, price: {self.price}, other_information: {self.other_information}}}"

@@ -3,7 +3,7 @@ from src.handlers.pinecone_handler import PineconeDBHandler
 from llama_index.vector_stores.types import ExactMatchFilter
 from tenacity import retry, wait_random, stop_after_attempt
 
-@retry(wait=wait_random(min=1, max=5), stop=stop_after_attempt(5))
+
 async def get_product_pages(
         CONFIG,
         name_of_product=None,
@@ -23,7 +23,7 @@ async def get_product_pages(
 
     index_name = "gcp-starter"
 
-    PineconeDBHandler.get_instance(index_name, CONFIG)
+    PineconeDBHandler.get_instance(index_name)
     customQuery = PineconeDBHandler.transform_query(name_of_product, type_of_product, brand_requested, screen_size, specs, \
                                                price, other_information) # formats the query to be used in the pinecone db
     
@@ -35,6 +35,7 @@ async def get_product_pages(
 
     for i in range(len(response)):
         response[i] = response[i]['metadata']
+    print("hey done")
 
     return response
 

@@ -11,12 +11,10 @@ router = APIRouter()
 
 class ServiceHealthEnum(str, Enum):
     """Enumerator class for possible service health values"""
-
     OK = "OK"
     FAILURE = "FAILURE"
     CRITICAL = "CRITICAL"
     UNKNOWN = "UNKNOWN"
-
 
 class HealthInfo(APIModel):
     """Pydantic model for health information response"""
@@ -25,8 +23,6 @@ class HealthInfo(APIModel):
     description: str = Field(..., description="Brief overview of the service")
     version: str = Field(..., description="Service version identifier")
     status: ServiceHealthEnum = Field(..., description="Current health state of the service")
-
-
 @router.get(
     "/status",
     response_model=HealthInfo,
@@ -36,6 +32,7 @@ class HealthInfo(APIModel):
     description="Carries out a health check and provides information about the active service.",
     responses={200: {"description": "Health state of the service"}},
 )
+
 async def get_health_status():
     """Conduct a health check and return the status."""
     return {
